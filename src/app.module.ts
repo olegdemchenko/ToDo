@@ -8,7 +8,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client'),
+      rootPath: join(__dirname, '..', 'client/build'),
     }),
     TasksModule,
   ],
