@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Alert from 'react-bootstrap/Alert';
@@ -6,24 +6,72 @@ import { Task } from '../../src/modules/tasks/interfaces/task.interface';
 import DescriptionInput from './DescriptionInput';
 import Header from './Header';
 import TasksList from './TasksList';
-import { response } from 'express';
+
+const initialState = {
+  tasks: [],
+  error: null,
+};
+
+type ACTIONTYPE =
+  | {
+      type: 'TASKS/ALLFETCHED';
+      payload: Task[];
+    }
+  | {
+      type: 'TASKS/DELETED';
+    }
+  | {
+      type: 'TASKS/ADDED';
+    }
+  | {
+      type: 'TASKS/STATUSCHANGED';
+    }
+  | {
+      type: 'ERROR';
+      payload: Response;
+    };
+
+function reducer(
+  state: { tasks: Task[]; error: null | Error },
+  action: ACTIONTYPE,
+) {
+  switch (action.type) {
+    case 'TASKS/ALLFETCHED':
+      return { tasks: action.payload, error: null };
+    case 'TASKS/ADDED': {
+      return { tasks: state.tasks, error: null };
+    }
+    case 'TASKS/DELETED': {
+      return { tasks: state.tasks, error: null };
+    }
+    case 'TASKS/STATUSCHANGED': {
+      return { tasks: state.tasks, error: null };
+    }
+    case 'ERROR':
+      return {
+        tasks: state.tasks,
+        error: new Error(
+          `Error with status ${action.payload.status}, ${action.payload.statusText}. Url ${action.payload.url}`,
+        ),
+      };
+    default:
+      throw new Error(`reducer action type is not defined`);
+  }
+}
 
 function Root() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [state, setState] = useState('idle');
-  const [error, setError] = useState<null | Error>(null);
-
+  const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     async function fetchAllTasks() {
+      if (state.error) {
+        return;
+      }
       const resp = await fetch('http://127.0.0.1:5000');
       if (resp.ok) {
-        const json = await resp.json();
-        setState('tasksFetched');
-        setTasks(json);
-        setError(null);
+        const tasks = await resp.json();
+        dispatch({ type: 'TASKS/ALLFETCHED', payload: tasks });
       } else {
-        setState('error');
-        setError(new Error(`Error with status ${response.status}`));
+        dispatch({ type: 'ERROR', payload: resp });
       }
     }
     fetchAllTasks();
@@ -40,11 +88,9 @@ function Root() {
       method: 'DELETE',
     });
     if (resp.ok) {
-      setState('taskDeleted');
-      setError(null);
+      dispatch({ type: 'TASKS/DELETED' });
     } else {
-      setState('error');
-      setError(new Error(`Error with status ${response.status}`));
+      dispatch({ type: 'ERROR', payload: resp });
     }
   }
 
@@ -55,11 +101,9 @@ function Root() {
       body: JSON.stringify({ description }),
     });
     if (resp.ok) {
-      setState('taskAdded');
-      setError(null);
+      dispatch({ type: 'TASKS/ADDED' });
     } else {
-      setState('error');
-      setError(new Error(`Error with status ${response.status}`));
+      dispatch({ type: 'ERROR', payload: resp });
     }
   }
 
@@ -70,19 +114,17 @@ function Root() {
       body: JSON.stringify({ ...task, active: !task.active }),
     });
     if (resp.ok) {
-      setState('taskStatusChanged');
-      setError(null);
+      dispatch({ type: 'TASKS/STATUSCHANGED' });
     } else {
-      setState('error');
-      setError(new Error(`Error with status ${response.status}`));
+      dispatch({ type: 'ERROR', payload: resp });
     }
   }
 
-  if (error) {
+  if (state.error) {
     return (
       <Container>
         <Header />
-        <Alert variant="danger">{error.message}</Alert>
+        <Alert variant="danger">{state.error.message}</Alert>
       </Container>
     );
   }
@@ -91,7 +133,7 @@ function Root() {
       <Header />
       <DescriptionInput handleAddTask={handleAdd} />
       <TasksList
-        tasks={tasks}
+        tasks={state.tasks}
         changeClb={handleChange}
         deleteClb={handleDelete}
         activateClb={handleStatusChange}
