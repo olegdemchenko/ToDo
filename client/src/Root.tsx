@@ -19,12 +19,15 @@ type ACTIONTYPE =
     }
   | {
       type: 'TASKS/DELETED';
+      payload: string;
     }
   | {
       type: 'TASKS/ADDED';
+      payload: Task;
     }
   | {
       type: 'TASKS/STATUSCHANGED';
+      payload: Task;
     }
   | {
       type: 'ERROR';
@@ -39,13 +42,21 @@ function reducer(
     case 'TASKS/ALLFETCHED':
       return { tasks: action.payload, error: null };
     case 'TASKS/ADDED': {
-      return { tasks: state.tasks, error: null };
+      return { tasks: [...state.tasks, action.payload], error: null };
     }
     case 'TASKS/DELETED': {
-      return { tasks: state.tasks, error: null };
+      return {
+        tasks: state.tasks.filter(({ id }) => id !== action.payload),
+        error: null,
+      };
     }
     case 'TASKS/STATUSCHANGED': {
-      return { tasks: state.tasks, error: null };
+      return {
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id ? action.payload : task,
+        ),
+        error: null,
+      };
     }
     case 'ERROR':
       return {
@@ -75,7 +86,7 @@ function Root() {
       }
     }
     fetchAllTasks();
-  }, [state]);
+  }, []);
 
   const navigate = useNavigate();
 
@@ -88,7 +99,7 @@ function Root() {
       method: 'DELETE',
     });
     if (resp.ok) {
-      dispatch({ type: 'TASKS/DELETED' });
+      dispatch({ type: 'TASKS/DELETED', payload: id });
     } else {
       dispatch({ type: 'ERROR', payload: resp });
     }
@@ -101,7 +112,8 @@ function Root() {
       body: JSON.stringify({ description }),
     });
     if (resp.ok) {
-      dispatch({ type: 'TASKS/ADDED' });
+      const newTask = await resp.json();
+      dispatch({ type: 'TASKS/ADDED', payload: newTask });
     } else {
       dispatch({ type: 'ERROR', payload: resp });
     }
@@ -114,7 +126,8 @@ function Root() {
       body: JSON.stringify({ ...task, active: !task.active }),
     });
     if (resp.ok) {
-      dispatch({ type: 'TASKS/STATUSCHANGED' });
+      const changedTask = await resp.json();
+      dispatch({ type: 'TASKS/STATUSCHANGED', payload: changedTask });
     } else {
       dispatch({ type: 'ERROR', payload: resp });
     }
