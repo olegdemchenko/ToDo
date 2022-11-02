@@ -7,21 +7,48 @@ interface TasksListProps {
   tasks: Task[];
   changeClb: (id: string) => void;
   deleteClb: (id: string) => void;
+  activateClb: (task: Task) => void;
 }
 
-function TasksList({ tasks, changeClb, deleteClb }: TasksListProps) {
+function TasksList({
+  tasks,
+  changeClb,
+  deleteClb,
+  activateClb,
+}: TasksListProps) {
   return (
-    <Row xs="2" sm="3" className="py-4">
-      {tasks.map((task, index) => (
-        <TaskItem
-          key={task.id}
-          taskNumber={index + 1}
-          task={task}
-          changeClb={changeClb}
-          deleteClb={deleteClb}
-        />
-      ))}
-    </Row>
+    <div>
+      <h4 className="m-0 p-4 text-center">Active tasks</h4>
+      <Row xs="2" sm="3" className="pb-4">
+        {tasks
+          .filter(({ active }) => active)
+          .map((task, index) => (
+            <TaskItem
+              key={task.id}
+              taskNumber={index + 1}
+              task={task}
+              changeClb={changeClb}
+              deleteClb={deleteClb}
+              activateClb={activateClb}
+            />
+          ))}
+      </Row>
+      <h4 className="m-0 p-4 text-center">Inactive tasks</h4>
+      <Row xs="2" sm="3" className="pb-4">
+        {tasks
+          .filter(({ active }) => !active)
+          .map((task, index) => (
+            <TaskItem
+              key={task.id}
+              taskNumber={index + 1}
+              task={task}
+              changeClb={changeClb}
+              deleteClb={deleteClb}
+              activateClb={activateClb}
+            />
+          ))}
+      </Row>
+    </div>
   );
 }
 

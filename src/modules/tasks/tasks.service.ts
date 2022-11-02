@@ -5,7 +5,28 @@ import { Task } from './interfaces/task.interface';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
+  private tasks: Task[] = [
+    {
+      description: 'First task',
+      active: true,
+    },
+    {
+      description: 'Second task',
+      active: true,
+    },
+    {
+      description: 'Third task',
+      active: true,
+    },
+    {
+      description: 'Fourth task',
+      active: true,
+    },
+    {
+      description: 'Fifth task',
+      active: true,
+    },
+  ].map((task) => ({ id: _.uniqueId(), ...task }));
 
   getAllTasks() {
     return this.tasks;
@@ -17,7 +38,7 @@ export class TasksService {
   }
 
   addTask(taskDescription: string) {
-    const newTask = new CreateTask(_.uniqueId(), taskDescription);
+    const newTask = new CreateTask(_.uniqueId(), taskDescription, true);
     this.tasks.push(newTask);
     return newTask;
   }

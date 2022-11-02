@@ -1,5 +1,10 @@
 import { Task } from '../interfaces/task.interface';
 
 export class CreateTask implements Task {
-  constructor(public id: string, public description: string) {}
+  constructor(
+    public id: string,
+    public description: string,
+    public active: boolean,
+  ) {}
+  status: string;
 }

@@ -63,6 +63,21 @@ function Root() {
     }
   }
 
+  async function handleStatusChange(task: Task) {
+    const resp = await fetch(`http://127.0.0.1:5000/${task.id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PATCH',
+      body: JSON.stringify({ ...task, active: !task.active }),
+    });
+    if (resp.ok) {
+      setState('taskStatusChanged');
+      setError(null);
+    } else {
+      setState('error');
+      setError(new Error(`Error with status ${response.status}`));
+    }
+  }
+
   if (error) {
     return (
       <Container>
@@ -79,6 +94,7 @@ function Root() {
         tasks={tasks}
         changeClb={handleChange}
         deleteClb={handleDelete}
+        activateClb={handleStatusChange}
       />
     </Container>
   );
