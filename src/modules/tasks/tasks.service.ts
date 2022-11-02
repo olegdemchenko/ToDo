@@ -5,14 +5,15 @@ import { Task } from './interfaces/task.interface';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [
-    { id: '1', description: 'First task' },
-    { id: '2', description: 'Second task' },
-    { id: '3', description: 'Third task' },
-  ];
+  private tasks: Task[] = [];
 
   getAllTasks() {
     return this.tasks;
+  }
+
+  getTask(taskId: string) {
+    const task = this.tasks.find(({ id }) => taskId === id);
+    return task;
   }
 
   addTask(taskDescription: string) {
