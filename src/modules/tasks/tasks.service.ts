@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Injectable } from '@nestjs/common';
-import { CreateTask } from './dto/create-task.dto';
+import { CreateTaskDto } from './dto/createTask.dto';
 import { Task } from './interfaces/task.interface';
 
 @Injectable()
@@ -37,8 +37,8 @@ export class TasksService {
     return task;
   }
 
-  addTask(taskDescription: string) {
-    const newTask = new CreateTask(_.uniqueId(), taskDescription, true);
+  addTask(createTaskDto: CreateTaskDto) {
+    const newTask = { id: _.uniqueId(), ...createTaskDto };
     this.tasks.push(newTask);
     return newTask;
   }

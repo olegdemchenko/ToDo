@@ -109,7 +109,7 @@ function Root() {
     const resp = await fetch('http://127.0.0.1:5000', {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
-      body: JSON.stringify({ description }),
+      body: JSON.stringify({ description, active: true }),
     });
     if (resp.ok) {
       const newTask = await resp.json();
