@@ -44,12 +44,6 @@ function reducer(
     case 'TASKS/ADDED': {
       return { tasks: [...state.tasks, action.payload], error: null };
     }
-    case 'TASKS/DELETED': {
-      return {
-        tasks: state.tasks.filter(({ id }) => id !== action.payload),
-        error: null,
-      };
-    }
     case 'TASKS/STATUSCHANGED': {
       return {
         tasks: state.tasks.map((task) =>
@@ -99,7 +93,8 @@ function Root() {
       method: 'DELETE',
     });
     if (resp.ok) {
-      dispatch({ type: 'TASKS/DELETED', payload: id });
+      const tasks = await resp.json();
+      dispatch({ type: 'TASKS/ALLFETCHED', payload: tasks });
     } else {
       dispatch({ type: 'ERROR', payload: resp });
     }

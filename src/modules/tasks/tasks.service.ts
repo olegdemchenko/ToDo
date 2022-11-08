@@ -39,12 +39,13 @@ export class TasksService {
 
   addTask(createTaskDto: CreateTaskDto) {
     const newTask = { id: _.uniqueId(), ...createTaskDto };
-    this.tasks.push(newTask);
+    this.tasks.push({ id: _.uniqueId(), ...createTaskDto });
     return newTask;
   }
 
   deleteTask(taskId: string) {
     this.tasks = this.tasks.filter(({ id }) => id !== taskId);
+    return this.tasks;
   }
 
   updateTask(updatedTask: Task) {
