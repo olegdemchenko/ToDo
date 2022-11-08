@@ -11,7 +11,7 @@ import { CreateTaskDto } from './dto/createTask.dto';
 import { TasksService } from './tasks.service';
 import { UpdateTaskDto } from './dto/updateTask.dto';
 
-@Controller()
+@Controller('tasks')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
