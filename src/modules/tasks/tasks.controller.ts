@@ -16,28 +16,27 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
-  getAllTasks() {
+  async getAllTasks() {
     return this.tasksService.getAllTasks();
   }
 
   @Get(':id')
-  getTask(@Param('id') id: string) {
+  async getTask(@Param('id') id: string) {
     return this.tasksService.getTask(id);
   }
 
   @Post()
-  addTask(@Body() createTaskDto: CreateTaskDto) {
+  async addTask(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.addTask(createTaskDto);
   }
 
-  @Patch(':id')
-  updateTask(@Body() updatedTask: UpdateTaskDto) {
+  @Patch()
+  async updateTask(@Body() updatedTask: UpdateTaskDto) {
     return this.tasksService.updateTask(updatedTask);
   }
 
   @Delete(':id')
-  deleteTask(@Param('id') id: string) {
-    this.tasksService.deleteTask(id);
+  async deleteTask(@Param('id') id: string) {
     return this.tasksService.deleteTask(id);
   }
 }

@@ -1,8 +1,8 @@
-import { IsNumberString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class UpdateTaskDto {
-  @IsNumberString()
-  id: string;
+  @IsString()
+  _id: string;
 
   @IsNotEmpty()
   description: string;

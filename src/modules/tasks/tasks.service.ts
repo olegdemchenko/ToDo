@@ -1,57 +1,40 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
 import * as _ from 'lodash';
-import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/createTask.dto';
+import { UpdateTaskDto } from './dto/updateTask.dto';
 import { Task } from './interfaces/task.interface';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [
-    {
-      description: 'First task',
-      active: true,
-    },
-    {
-      description: 'Second task',
-      active: true,
-    },
-    {
-      description: 'Third task',
-      active: true,
-    },
-    {
-      description: 'Fourth task',
-      active: true,
-    },
-    {
-      description: 'Fifth task',
-      active: true,
-    },
-  ].map((task) => ({ id: _.uniqueId(), ...task }));
+  constructor(
+    @Inject('TASK_MODEL')
+    private taskModel: Model<Task>,
+  ) {}
 
-  getAllTasks() {
-    return this.tasks;
+  async getAllTasks() {
+    return this.taskModel.find().exec();
   }
 
-  getTask(taskId: string) {
-    const task = this.tasks.find(({ id }) => taskId === id);
-    return task;
+  async getTask(id: string) {
+    return this.taskModel.findById(id).exec();
   }
 
-  addTask(createTaskDto: CreateTaskDto) {
-    const newTask = { id: _.uniqueId(), ...createTaskDto };
-    this.tasks.push({ id: _.uniqueId(), ...createTaskDto });
-    return newTask;
+  async addTask(createTaskDto: CreateTaskDto) {
+    const createdTask = this.taskModel.create(createTaskDto);
+    return createdTask;
   }
 
-  deleteTask(taskId: string) {
-    this.tasks = this.tasks.filter(({ id }) => id !== taskId);
-    return this.tasks;
+  async deleteTask(id: string) {
+    await this.taskModel.findByIdAndDelete(id);
+    return this.getAllTasks();
   }
 
-  updateTask(updatedTask: Task) {
-    this.tasks = this.tasks.map((task) =>
-      task.id === updatedTask.id ? updatedTask : task,
+  async updateTask(updatedTask: UpdateTaskDto) {
+    return this.taskModel.findByIdAndUpdate(
+      updatedTask._id,
+      _.pick(updatedTask, ['description', 'active']),
+      { new: true },
     );
-    return updatedTask;
   }
 }
