@@ -17,7 +17,10 @@ export class AuthService {
     if (!user) {
       return null;
     }
-    const passwordMatch = await bcrypt.compare(pass, user.password);
+    const passwordMatch = await this.usersService.compareUserPasswords(
+      pass,
+      user.password,
+    );
     if (!passwordMatch) {
       return null;
     }
@@ -38,12 +41,7 @@ export class AuthService {
   }
 
   async signUp(userDTO: UserDto) {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(userDTO.password, saltRounds);
-    const user = await this.usersService.saveUser({
-      ...userDTO,
-      password: hashedPassword,
-    });
+    const user = await this.usersService.saveUser(userDTO);
     return this.login(user);
   }
 }
