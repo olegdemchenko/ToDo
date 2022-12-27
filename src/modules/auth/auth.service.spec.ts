@@ -1,7 +1,6 @@
 import { Test } from '@nestjs/testing';
 import * as _ from 'lodash';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -11,6 +10,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersService } from '../users/users.service';
 import { UserDto } from '../users/dto/user.dto';
 import { User } from '../users/interfaces/user.interface';
+import { jwtConstants } from './constants';
 
 const fakeUser = {
   _id: '1',
@@ -35,15 +35,9 @@ describe('authService', () => {
     const authModule = await Test.createTestingModule({
       imports: [
         PassportModule,
-        JwtModule.registerAsync({
-          imports: [ConfigModule],
-          useFactory: async (configService: ConfigService) => {
-            return {
-              secret: configService.get('SECRET_KEY'),
-              signOptions: { expiresIn: '3600s' },
-            };
-          },
-          inject: [ConfigService],
+        JwtModule.register({
+          secret: jwtConstants.secret,
+          signOptions: { expiresIn: '3600s' },
         }),
       ],
       controllers: [AuthController],
