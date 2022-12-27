@@ -12,7 +12,7 @@ export class UsersService {
   ) {}
 
   async findUser(username: string) {
-    return this.userModel.findOne({ username }).exec();
+    return this.userModel.findOne({ username });
   }
 
   async compareUserPasswords(plaintextPass: string, hash: string) {

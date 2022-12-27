@@ -13,16 +13,15 @@ export class TasksService {
   ) {}
 
   async getAllTasks() {
-    return this.taskModel.find().exec();
+    return this.taskModel.find();
   }
 
   async getTask(id: string) {
-    return this.taskModel.findById(id).exec();
+    return this.taskModel.findById(id);
   }
 
   async addTask(createTaskDto: CreateTaskDto) {
-    const createdTask = this.taskModel.create(createTaskDto);
-    return createdTask;
+    return this.taskModel.create(createTaskDto);
   }
 
   async deleteTask(id: string) {
