@@ -7,7 +7,6 @@ import {
   Delete,
   Param,
   UseGuards,
-  Session,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateTaskDto } from './dto/createTask.dto';
@@ -20,8 +19,7 @@ export class TasksController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getAllTasks(@Session() session: Record<string, any>) {
-    session.visits = session.visits ? session.visits + 1 : 1;
+  async getAllTasks() {
     return this.tasksService.getAllTasks();
   }
 
