@@ -10,19 +10,28 @@ describe('tasks module', () => {
     _id: string;
     description: string;
     active: boolean;
+    userId: string;
   }
   let app: INestApplication;
 
-  const testTask = { _id: '0', description: 'testTask', active: true };
+  const testTask: Task = {
+    _id: '0',
+    description: 'testTask for user1',
+    userId: 'user1',
+    active: true,
+  };
 
   class MockTasksModel {
     private tasks: Task[];
     constructor() {
-      this.tasks = [testTask];
+      this.tasks = [
+        testTask,
+        { ...testTask, description: 'testTask for user2', userId: 'user2' },
+      ];
     }
 
-    async find() {
-      return this.tasks;
+    async find({ userId }: { userId: string }) {
+      return this.tasks.filter((task) => userId === task.userId);
     }
 
     async findById(id: string) {
@@ -61,7 +70,7 @@ describe('tasks module', () => {
       .useValue({
         canActivate: (context: ExecutionContext) => {
           const req = context.switchToHttp().getRequest();
-          req.user = { username: 'fakeuser', password: 'fakeuserpassword' };
+          req.user = { userId: testTask.userId, username: 'fakeuser' };
           return true;
         },
       })
@@ -71,7 +80,7 @@ describe('tasks module', () => {
     await app.init();
   });
 
-  it('should return all tasks', () => {
+  it('should return all tasks that belong to a specific user', () => {
     return request(app.getHttpServer()).get('/tasks/').expect(200, [testTask]);
   });
 

@@ -12,21 +12,21 @@ export class TasksService {
     private taskModel: Model<Task>,
   ) {}
 
-  async getAllTasks() {
-    return this.taskModel.find();
+  async getAllTasks(userId: string) {
+    return this.taskModel.find({ userId });
   }
 
   async getTask(id: string) {
     return this.taskModel.findById(id);
   }
 
-  async addTask(createTaskDto: CreateTaskDto) {
-    return this.taskModel.create(createTaskDto);
+  async addTask(createTaskDto: CreateTaskDto, userId: string) {
+    return this.taskModel.create({ userId, ...createTaskDto });
   }
 
-  async deleteTask(id: string) {
+  async deleteTask(id: string, userId: string) {
     await this.taskModel.findByIdAndDelete(id);
-    return this.getAllTasks();
+    return this.getAllTasks(userId);
   }
 
   async updateTask(updatedTask: UpdateTaskDto) {
