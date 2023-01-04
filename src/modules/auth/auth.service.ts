@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import * as _ from 'lodash';
+import { UsersService } from '../users/users.service';
 import { User } from '../users/interfaces/user.interface';
 import { UserDto } from '../users/dto/user.dto';
 
@@ -23,8 +24,7 @@ export class AuthService {
     if (!passwordMatch) {
       return null;
     }
-    const { password, ...result } = user;
-    return result;
+    return _.omit(user, 'password');
   }
 
   async validateUser(username: string) {
